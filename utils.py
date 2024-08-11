@@ -7,7 +7,7 @@ import streamlit as st
 import anthropic
 
 # Get api key from secrets.toml file
-api_key = st.secrets.api.ANTHROPIC_API_KEY
+api_key = st.secrets["ANTHROPIC_API_KEY"]
 
 # model = ChatAnthropic(model='claude-3-opus-20240229')
 client = anthropic.Anthropic()
