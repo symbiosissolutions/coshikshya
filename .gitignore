@@ -34,3 +34,6 @@ Thumbs.db
 
 # Streamlit specific
 .streamlit/config.toml
+
+# Ignore secrets or config file
+secrets.toml

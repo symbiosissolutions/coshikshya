@@ -4,7 +4,7 @@ from streamlit_option_menu import option_menu
 from views.science_labs import app as science_labs_app
 from views.math_spiral_review import app as math_spiral_review_app  
 from views.dok_questions import app as dok_questions_app
-
+from views.group_work_generator import app as group_work_generator_app
 
 # Set up the page configuration with a title and an icon
 st.set_page_config(
@@ -17,8 +17,8 @@ def main():
     with st.sidebar:
         selected = option_menu(
             "CoShikshya",
-            ["DOK Questions", "Math Spiral Review", "Science Labs"],
-            icons=["journals", "calculator", "funnel"],
+            ["DOK Questions", "Math Spiral Review", "Science Labs", "Group Work Generator"],
+            icons=["journals", "calculator", "funnel", "people"],
             menu_icon = ["book"],
              # Default selected item
             default_index=0,
@@ -43,13 +43,17 @@ def main():
             },
         )
 
-    # Conditional rendering based on the selected menu item
-    if selected == "Science Labs":
-        science_labs_app()
-    elif selected == "Math Spiral Review":
-        math_spiral_review_app()
-    elif selected == "DOK Questions":
-        dok_questions_app()
+    # Define a dictionary to map menu items to their corresponding functions
+    menu_mapping = {
+        "Science Labs": science_labs_app,
+        "Math Spiral Review": math_spiral_review_app,
+        "DOK Questions": dok_questions_app,
+        "Group Work Generator": group_work_generator_app
+    }
+
+    # Call the function based on the selected menu item
+    if selected in menu_mapping:
+        menu_mapping[selected]()
 
 # Run the main function
 if __name__ == "__main__":

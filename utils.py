@@ -1,16 +1,24 @@
 import streamlit as st
 
-import os
-from dotenv import load_dotenv
+# import os
+# from dotenv import load_dotenv
 
 # from langchain_anthropic import ChatAnthropic
 import anthropic
 
+import toml
+
+secrets = toml.load("secrets.toml")
+
+api_key = secrets["api"]["ANTHROPIC_API_KEY"]
+print(api_key)
+
+
 # Load the environment variables from the .env file
-load_dotenv()
+# load_dotenv()
 
 # Get the API key from the environment variables
-api_key = os.getenv("ANTHROPIC_API_KEY")
+# api_key = os.getenv("ANTHROPIC_API_KEY")
 
 # model = ChatAnthropic(model='claude-3-opus-20240229')
 client = anthropic.Anthropic()
@@ -36,10 +44,12 @@ def generate_page(icon, title, description, fields, process_function):
 
         if submit:
             if all(inputs.values()):
-                response = process_function(inputs)
+                with st.spinner("Generating response..."):
+                    response = process_function(inputs)
                 st.success(response)
             else:
                 st.error("Please fill out all fields.")
+
 
 # Generates a response based on the provided task description and fields.
 def generate_response(task_description, user_prompt_template, fields):
@@ -132,31 +142,37 @@ prompts_and_fields = {
             Please generate the spiral review problem set based on the given standard or topic.
         """,
     },
+    "Group Work Generator": {
+        "description": "Generate group work activity for students based on a a topic, standard, or objective.",
+        "fields": ["Topic"],
+        "user_prompt_template": """
+            You are tasked with creating a group work activity for students based on a given topic, standard,
+            or objective. The goal of the activity is to promote collaboration, communication, and critical 
+            thinking among students.
+
+            Please follow these guidelines:
+
+            Choose a topic, standard, or objective that you would like to base your group work activity on.
+            Determine the number of students per group and the roles they will play (e.g.g., leader, recorder, presenter).
+            Develop a group work activity that is engaging, challenging, and relevant to the chosen topic, standard, or objective.
+            Provide clear instructions for each group role and the overall group work process.
+            Include a rubric or evaluation criteria for assessing group work performance.
+            Here is the topic, standard, or objective you will be working with:
+
+            Topic: {{Topic}}
+
+            Please generate a group work activity based on the given topic, standard, or objective.
+        """,
+    },
 }
 
 
-def process_science_labs(fields):
-    task_info = prompts_and_fields["Science Labs"]
+# Dynamic process function for all tools
+def process_tools(fields, tool):
+    task_info = prompts_and_fields[tool]
     return generate_response(
         task_info["description"], task_info["user_prompt_template"], fields
     )
 
-
-def process_dok_questions(fields):
-    task_info = prompts_and_fields["DOK Questions"]
-    return generate_response(task_info["description"], task_info["user_prompt_template"], fields)
-
-
-def process_math_spiral_review(fields):
-    task_info = prompts_and_fields["Math Spiral Review"]
-    return generate_response(
-        task_info["description"], task_info["user_prompt_template"], fields
-    )
-
-
-# Mapping task titles to their processing functions
-task_to_process_function = {
-    "Science Labs": process_science_labs,
-    "DOK Questions": process_dok_questions,
-    "Math Spiral Review": process_math_spiral_review,
-}
+# Mapping task titles to the dynamic process function
+task_to_process_function = {tool: lambda fields: process_tools(fields, tool) for tool in prompts_and_fields}

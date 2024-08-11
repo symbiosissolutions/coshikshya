@@ -1,5 +1,4 @@
-import streamlit as st
-from utils import generate_page, process_science_labs
+from utils import generate_page, process_tools
 
 # Define the app function to set up the Science Labs page
 def app():
@@ -9,5 +8,5 @@ def app():
         "Science Labs", # The title of the page
         "Generate an engaging science lab based on topics and standards of your choice!",  # Description of the page's purpose
         ["Topic"], # The fields needed for user input
-        process_function=process_science_labs  # The function to process the inputs and generate the response
+        process_function=lambda fields: process_tools(fields, "Science Labs")  # Use the dynamic process function
     )
