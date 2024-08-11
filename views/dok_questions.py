@@ -9,5 +9,7 @@ def app():
         "DOK Questions",  # The title of the page
         "Generate questions based on topic or standard for each of the 4 Depth of Knowledge (DOK) levels!",  # Description of the page's purpose
         ["Topic", "Grade Level"],  # The fields needed for user input
-        process_function=lambda fields: process_tools(fields, "DOK Questions")  # Use the dynamic process function
+        process_function=lambda fields: process_tools(
+            fields, "DOK Questions"
+        ),  # Use the dynamic process function
     )

@@ -1,15 +1,10 @@
 import streamlit as st
 
-# import os
-# from dotenv import load_dotenv
-
-# from langchain_anthropic import ChatAnthropic
 import anthropic
 
 # Get api key from secrets.toml file
 api_key = st.secrets["ANTHROPIC_API_KEY"]
 
-# model = ChatAnthropic(model='claude-3-opus-20240229')
 client = anthropic.Anthropic()
 
 
@@ -153,6 +148,104 @@ prompts_and_fields = {
             Please generate a group work activity based on the given topic, standard, or objective.
         """,
     },
+    "Make It Relevant": {
+        "description": "Generate several ideas that make what you’re teaching relevant to your class based on their interests and background",
+        "fields": ["Topic"],
+        "user_prompt_template": """
+            You are tasked with generating several ideas that make the content you are teaching relevant to your students based on their interests and background. The goal is to create connections between the subject matter and your students' lives, making the learning experience more engaging and meaningful.
+
+            Please follow these guidelines:
+
+            Identify the topic, standard, or objective you will be teaching.
+            Research your students' interests, hobbies, and backgrounds.
+            Brainstorm several ideas that connect the subject matter to your students' lives, using their 
+            interests and backgrounds as a starting point.
+            Develop activities, examples, or projects that incorporate these connections and make the content
+            more relevant to your students.
+            Consider using a variety of strategies, such as real-world examples, analogies, and personal stories,
+            to engage your students and help them relate to the subject matter.
+            Here is the topic, standard, or objective you will be working with:
+
+       
+            Topic: {{Topic}}
+
+            Please generate several ideas that make the given topic, standard, or objective relevant to your 
+            class based on their interests and backgrounds.
+
+        """,
+    },
+    "Write An Email": {
+        "description": "Generate a draft of email for various uses such as administrative communication, parental communication or professional use about a certain subject with a choice of tone for the email",
+        "fields": ["Subject", "Audience", "Tone", "Purpose"],
+        "user_prompt_template": """
+            You are tasked with generating a draft of an email for various uses, such as administrative 
+            communication, parental communication, or professional use. The email should address a specific 
+            subject and include the following components:
+
+            Subject Line: Clearly state the main topic of the email in a concise and engaging manner.
+            Introduction: Begin with a brief greeting and introduce the purpose of the email.
+            Body: Provide relevant information and details about the subject, keeping the tone appropriate for 
+            the intended audience.
+            Conclusion: Summarize the main points and include a call to action or request, if applicable.
+            Closing: End the email with a professional sign-off and your name or signature.
+            Please provide the following information:
+
+            Subject: {{Subject}}
+
+            Audience: {{Audience}}
+
+            Tone:{{Tone}}
+
+            Purpose: {{Purpose}}
+
+            Now, compose a draft of an email based on the provided information, keeping the tone and purpose in 
+            mind. Make sure to address the subject clearly and professionally while engaging the intended 
+            audience.
+        """,
+    },
+    "Lesson Planner": {
+        "description": "Generate a lesson plan for a topic or objective you’re teaching",
+        "fields": ["Topic", "Grade Level", "Duration"],
+        "user_prompt_template": """
+            You are tasked with creating a lesson plan for a specific topic or objective that you will be teaching. Your lesson plan should include the following components:
+
+            Objective: Clearly state the goal of the lesson and what students should be able to achieve by the end of the class.
+            Materials: List all the materials and resources needed for the lesson, such as textbooks, handouts, and digital resources.
+            Procedure: Provide a step-by-step outline of the lesson, including the time allocated for each activity and how you will engage students in the learning process.
+            Assessment: Describe the methods you will use to assess students' understanding and progress during and after the lesson.
+            Differentiation: Include strategies to accommodate diverse learning needs and abilities, such as providing visual aids, alternative activities, or additional support.
+            Please provide the topic or objective you will be teaching, as well as the grade level and class duration:
+
+            Topic: {{Topic}}
+
+            Grade Level:{{Grade Level}}
+
+            Class Duration: {{Duration}}
+        """,
+    },
+    "Worksheet Generator": {
+        "description": "Generate a worksheet based on any topic and grade level",
+        "fields": ["Topic", "Grade Level"],
+        "user_prompt_template": """
+            You are tasked with generating a worksheet based on a given topic and grade level. Your worksheet should include the following components:
+
+            Introduction: Provide a brief overview of the topic and its relevance to the students' learning objectives.
+            Tasks and Questions: Create a series of tasks and questions that are appropriate for the given grade level and aligned with the topic.
+            Answer Key: Include an answer key or model solutions for the tasks and questions, as applicable.
+            Please provide the following information:
+
+            Topic:{{Topic}}
+
+            Grade Level: {{Grade Level}}
+            Now, develop your worksheet using the guidelines provided above. Make sure to include one question for each DOK level to assess students' understanding at different depths of knowledge.
+
+            DOK 1: Create a question that requires simple recall of facts, definitions, or basic concepts.
+            DOK 2: Develop a question that involves skills, concepts, or mental processing beyond simple recall.
+            DOK 3: Craft a question that demands strategic thinking, reasoning, and complex mental processing.
+            DOK 4: Design a question that requires extended thinking, often over longer periods, and may involve real-world application or multiple concepts.
+            Once you have created the worksheet, please provide the completed worksheet along with the answer key or model solutions.
+        """,
+    },
 }
 
 
@@ -163,5 +256,8 @@ def process_tools(fields, tool):
         task_info["description"], task_info["user_prompt_template"], fields
     )
 
+
 # Mapping task titles to the dynamic process function
-task_to_process_function = {tool: lambda fields: process_tools(fields, tool) for tool in prompts_and_fields}
+task_to_process_function = {
+    tool: lambda fields: process_tools(fields, tool) for tool in prompts_and_fields
+}
