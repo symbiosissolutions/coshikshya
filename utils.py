@@ -6,19 +6,8 @@ import streamlit as st
 # from langchain_anthropic import ChatAnthropic
 import anthropic
 
-import toml
-
-secrets = toml.load("secrets.toml")
-
-api_key = secrets["api"]["ANTHROPIC_API_KEY"]
-print(api_key)
-
-
-# Load the environment variables from the .env file
-# load_dotenv()
-
-# Get the API key from the environment variables
-# api_key = os.getenv("ANTHROPIC_API_KEY")
+# Get api key from secrets.toml file
+api_key = st.secrets.api.ANTHROPIC_API_KEY
 
 # model = ChatAnthropic(model='claude-3-opus-20240229')
 client = anthropic.Anthropic()
