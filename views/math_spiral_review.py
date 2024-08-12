@@ -8,7 +8,7 @@ def app():
         "➗",  # The icon to be displayed
         "Math Spiral Review",  # The title of the page
         "Generate a spiral review problem set for any math standards or topics!",  # Description of the page's purpose
-        ["Topic"],  # The fields needed for user input
+        ["Topic", "Grade Level"],  # The fields needed for user input
         process_function=lambda fields: process_tools(
             fields, "Math Spiral Review"
         ),  # Use the dynamic process function

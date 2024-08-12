@@ -8,7 +8,7 @@ def app():
         "💡",  # The icon to be displayed
         "Make It Relevant",  # The title of the page
         "Generate several ideas that make what you’re teaching relevant to your class based on their interests and background!",  # Description of the page's purpose
-        ["Topic"],  # The fields needed for user input
+        ["Topic", "Student Interests"],  # The fields needed for user input
         process_function=lambda fields: process_tools(
             fields, "Make It Relevant"
         ),  # Use the dynamic process function

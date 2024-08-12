@@ -62,10 +62,10 @@ def generate_response(task_description, user_prompt_template, fields):
 prompts_and_fields = {
     "Science Labs": {
         "description": "Generate a detailed science lab activity.",
-        "fields": ["Topic"],
+        "fields": ["Topic", "Grade Level"],
         "user_prompt_template": """
-           You are tasked with creating an engaging science lab based on a chosen topic and standard. 
-           Your goal is to design a lab that encourages hands-on learning, critical thinking, and inquiry-based exploration.
+            You are tasked with creating an engaging science lab based on a chosen topic and standard. Your goal is to design a lab that encourages hands-on learning, critical thinking, and inquiry-based exploration.
+
             Please follow these guidelines:
 
             Choose a science topic or standard that you would like to base your lab on.
@@ -74,9 +74,11 @@ prompts_and_fields = {
             Provide clear instructions for setting up the experiment, performing the procedure, and recording observations.
             Incorporate opportunities for students to make predictions, analyze data, and draw conclusions.
             Include a discussion or reflection section where students can share their findings and insights.
-            Here is the science topic or standard you will be working with:
+            Here is the science topic or standard and grade level you will be working with:
 
             Topic: {{Topic}}
+
+            Grade Level: {{Grade Level}}
 
             Please create an engaging science lab based on the given topic or standard.
         """,
@@ -108,7 +110,7 @@ prompts_and_fields = {
     },
     "Math Spiral Review": {
         "description": "Generate a spiral review problem set for a given math standard or topic.",
-        "fields": ["Topic"],
+        "fields": ["Topic", "Grade Level"],
         "user_prompt_template": """
             You are tasked with creating a spiral review problem set for a given math standard or topic. A spiral review is a method of revisiting previously learned concepts throughout the year to reinforce learning and maintain retention.
 
@@ -119,20 +121,20 @@ prompts_and_fields = {
             Ensure that the problems are arranged in a way that progressively increases in difficulty.
             Include problems from different domains of mathematics, such as algebra, geometry, statistics, and probability, as applicable to the chosen standard or topic.
             Provide clear and concise instructions for each problem, and include an answer key at the end of the problem set.
-            Here is the math standard or topic you will be working with:
+            Here is the math standard or topic and grade level you will be working with:
 
             Topic: {{Topic}}
+
+            Grade Level: {{Grade Level}}
 
             Please generate the spiral review problem set based on the given standard or topic.
         """,
     },
     "Group Work Generator": {
         "description": "Generate group work activity for students based on a a topic, standard, or objective.",
-        "fields": ["Topic"],
+        "fields": ["Subject", "Topic"],
         "user_prompt_template": """
-            You are tasked with creating a group work activity for students based on a given topic, standard,
-            or objective. The goal of the activity is to promote collaboration, communication, and critical 
-            thinking among students.
+            You are tasked with creating a group work activity for students based on a given topic, standard, or objective. The goal of the activity is to promote collaboration, communication, and critical thinking among students.
 
             Please follow these guidelines:
 
@@ -141,7 +143,9 @@ prompts_and_fields = {
             Develop a group work activity that is engaging, challenging, and relevant to the chosen topic, standard, or objective.
             Provide clear instructions for each group role and the overall group work process.
             Include a rubric or evaluation criteria for assessing group work performance.
-            Here is the topic, standard, or objective you will be working with:
+            Here is the subject and topic, standard, or objective you will be working with:
+
+            SUbject: {{Subject}}
 
             Topic: {{Topic}}
 
@@ -150,7 +154,7 @@ prompts_and_fields = {
     },
     "Make It Relevant": {
         "description": "Generate several ideas that make what you’re teaching relevant to your class based on their interests and background",
-        "fields": ["Topic"],
+        "fields": ["Topic", "Student Interests"],
         "user_prompt_template": """
             You are tasked with generating several ideas that make the content you are teaching relevant to your students based on their interests and background. The goal is to create connections between the subject matter and your students' lives, making the learning experience more engaging and meaningful.
 
@@ -158,16 +162,14 @@ prompts_and_fields = {
 
             Identify the topic, standard, or objective you will be teaching.
             Research your students' interests, hobbies, and backgrounds.
-            Brainstorm several ideas that connect the subject matter to your students' lives, using their 
-            interests and backgrounds as a starting point.
-            Develop activities, examples, or projects that incorporate these connections and make the content
-            more relevant to your students.
-            Consider using a variety of strategies, such as real-world examples, analogies, and personal stories,
-            to engage your students and help them relate to the subject matter.
-            Here is the topic, standard, or objective you will be working with:
+            Brainstorm several ideas that connect the subject matter to your students' lives, using their interests and backgrounds as a starting point.
+            Develop activities, examples, or projects that incorporate these connections and make the content more relevant to your students.
+            Consider using a variety of strategies, such as real-world examples, analogies, and personal stories, to engage your students and help them relate to the subject matter.
+            Here is the topic, standard, or objective and student interests you will be working with:
 
-       
             Topic: {{Topic}}
+
+            Student Interests: {{Student Interests}}
 
             Please generate several ideas that make the given topic, standard, or objective relevant to your 
             class based on their interests and backgrounds.
@@ -225,7 +227,7 @@ prompts_and_fields = {
     },
     "Worksheet Generator": {
         "description": "Generate a worksheet based on any topic and grade level",
-        "fields": ["Topic", "Grade Level"],
+        "fields": ["Subject", "Topic", "Grade Level"],
         "user_prompt_template": """
             You are tasked with generating a worksheet based on a given topic and grade level. Your worksheet should include the following components:
 
@@ -233,6 +235,8 @@ prompts_and_fields = {
             Tasks and Questions: Create a series of tasks and questions that are appropriate for the given grade level and aligned with the topic.
             Answer Key: Include an answer key or model solutions for the tasks and questions, as applicable.
             Please provide the following information:
+
+            Subject: {{Subject}}
 
             Topic:{{Topic}}
 

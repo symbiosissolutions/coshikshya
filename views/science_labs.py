@@ -8,7 +8,7 @@ def app():
         "🧪",  # The icon to be displayed
         "Science Labs",  # The title of the page
         "Generate an engaging science lab based on topics and standards of your choice!",  # Description of the page's purpose
-        ["Topic"],  # The fields needed for user input
+        ["Topic", "Grade Level"],  # The fields needed for user input
         process_function=lambda fields: process_tools(
             fields, "Science Labs"
         ),  # Use the dynamic process function

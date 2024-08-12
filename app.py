@@ -15,6 +15,7 @@ from views.worksheet_generator import app as worksheet_generator_app
 st.set_page_config(
     page_title="CoShikshya",
     page_icon="👩‍🏫",
+    layout="wide",
 )
 
 

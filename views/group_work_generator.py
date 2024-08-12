@@ -8,7 +8,7 @@ def app():
         "📋",  # The icon to be displayed
         "Group Work",  # The title of the page
         "Generate group work activity for students based on a a topic, standard, or objective!",  # Description of the page's purpose
-        ["Topic"],  # The fields needed for user input
+        ["Subject", "Topic"],  # The fields needed for user input
         process_function=lambda fields: process_tools(
             fields, "Group Work Generator"
         ),  # Use the dynamic process function
