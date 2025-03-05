@@ -5,27 +5,24 @@ from utils import generate_page, process_tools
 def app():
     # Call the generate_page function to create the page
     generate_page(
-        "📝",  # The icon to be displayed
-        "Lesson Planner",  # The title of the page
-        "Generate a lesson plan for a topic or objective you’re teaching!",  # Description of the page's purpose
+        "📒",  # The icon to be displayed
+        "Lesson Notes",  # The title of the page
+        "Create engaging lesson notes that break down complex topics into clear, memorable points!",  # Description of the page's purpose
         [
             "Topic",
             "Grade Level",
-            "Duration",
             "Additional Materials",
         ],  # The fields needed for user input
         process_function=lambda fields: process_tools(
-            fields, "Lesson Planner"
+            fields, "Lesson Notes"
         ),  # Use the dynamic process function
         input_types={
             "Topic": "text_input",
             "Grade Level": "text_input",
-            "Duration": "text_input",
             "Additional Materials": "file_upload",
         },
         placeholders={
-            "Topic": "Pick any topic! Like: Photosynthesis, Fractions, World War II",
-            "Grade Level": "Tell us the grade you're teaching: Grade 5, Middle School",
-            "Duration": "How long is your class? (30 mins, 45 mins, 1 hour)",
+            "Topic": "Pick any topic! Like: Forces and Motion, Trigonometry",
+            "Grade Level": "Which grade is this for? (Grade 9, High School)",
         },
     )

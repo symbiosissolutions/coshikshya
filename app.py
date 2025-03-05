@@ -1,14 +1,12 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 
-from views.science_labs import app as science_labs_app
-from views.math_spiral_review import app as math_spiral_review_app
-from views.dok_questions import app as dok_questions_app
-from views.group_work_generator import app as group_work_generator_app
+from views.lesson_planner import app as lesson_planner_app
+from views.assessment_generator import app as assessment_generator_app
+from views.lesson_notes import app as lesson_notes_app
 from views.make_it_relevant import app as make_it_relevant_app
 from views.write_an_email import app as write_an_email_app
-from views.lesson_planner import app as lesson_planner_app
-from views.worksheet_generator import app as worksheet_generator_app
+from views.text_rewriter import app as text_rewriter_app
 
 
 # Set up the page configuration with a title and an icon
@@ -25,24 +23,20 @@ def main():
         selected = option_menu(
             "CoShikshya",
             [
-                "DOK Questions",
-                "Math Spiral Review",
-                "Science Labs",
-                "Group Work Generator",
-                "Make It Relevant",
-                "Write An Email",
                 "Lesson Planner",
-                "Worksheet Generator",
+                "Assessment Generator",
+                "Lesson Notes",
+                "Make It Relevant",
+                "Text Rewriter",
+                "Write An Email",
             ],
             icons=[
-                "journals",
-                "calculator",
-                "funnel",
-                "people",
-                "lightbulb",
-                "envelope-at",
                 "journal-plus",
-                "clipboard2",
+                "clipboard2-check",
+                "journals",
+                "lightbulb",
+                "vector-pen",
+                "envelope-at",
             ],
             menu_icon=["book"],
             # Default selected item
@@ -70,14 +64,12 @@ def main():
 
     # Define a dictionary to map menu items to their corresponding functions
     menu_mapping = {
-        "Science Labs": science_labs_app,
-        "Math Spiral Review": math_spiral_review_app,
-        "DOK Questions": dok_questions_app,
-        "Group Work Generator": group_work_generator_app,
+        "Lesson Planner": lesson_planner_app,
+        "Assessment Generator": assessment_generator_app,
+        "Lesson Notes": lesson_notes_app,
         "Make It Relevant": make_it_relevant_app,
         "Write An Email": write_an_email_app,
-        "Lesson Planner": lesson_planner_app,
-        "Worksheet Generator": worksheet_generator_app,
+        "Text Rewriter": text_rewriter_app,
     }
 
     # Call the function based on the selected menu item

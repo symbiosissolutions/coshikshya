@@ -9,7 +9,15 @@ client = anthropic.Anthropic()
 
 
 # Generates a page in the Streamlit app with a form to collect user inputs.
-def generate_page(icon, title, description, fields, process_function):
+def generate_page(
+    icon,
+    title,
+    description,
+    fields,
+    process_function,
+    input_types=None,
+    placeholders=None,
+):
     # Combine icon and title for the page header
     st.title(f"{icon} {title}")
     st.subheader(description)
@@ -17,12 +25,36 @@ def generate_page(icon, title, description, fields, process_function):
     # Form to collect user inputs with unique key
     with st.form(f"{title.lower().replace(' ', '_')}_form"):
         inputs = {}
+        input_types = input_types or {}
+        placeholders = placeholders or {}
+
         for field in fields:
-            # Dictionary -> fields : st.text_input
-            # eg "Topic": st.text_input("Topic", key="math_spiral_review_topic"
-            inputs[field] = st.text_input(
-                field, key=f"{title.lower().replace(' ', '_')}_{field.lower()}"
-            )
+            field_type = input_types.get(field, "text_input")
+            placeholder = placeholders.get(field, f"Enter {field.lower()} here...")
+
+            if field_type == "text_area":
+                inputs[field] = st.text_area(
+                    field,
+                    placeholder=placeholder,
+                    height=200,
+                    key=f"{title.lower().replace(' ', '_')}_{field.lower()}",
+                )
+            elif field_type == "file_upload":
+                uploaded_file = st.file_uploader(
+                    field,
+                    type=["doc", "docx", "pdf"],
+                    key=f"{title.lower().replace(' ', '_')}_{field.lower()}",
+                )
+                if uploaded_file:
+                    inputs[field] = uploaded_file.read().decode()
+            else:
+                # Dictionary -> fields : st.text_input
+                # eg "Topic": st.text_input("Topic", key="math_spiral_review_topic"
+                inputs[field] = st.text_input(
+                    field,
+                    placeholder=placeholder,
+                    key=f"{title.lower().replace(' ', '_')}_{field.lower()}",
+                )
 
         submit = st.form_submit_button(label=f"Generate {title}")
 
@@ -154,13 +186,13 @@ prompts_and_fields = {
     },
     "Make It Relevant": {
         "description": "Generate several ideas that make what you’re teaching relevant to your class based on their interests and background",
-        "fields": ["Topic", "Student Interests"],
+        "fields": ["Topic", "Grade Level", "Student Interests"],
         "user_prompt_template": """
             You are tasked with generating several ideas that make the content you are teaching relevant to your students based on their interests and background. The goal is to create connections between the subject matter and your students' lives, making the learning experience more engaging and meaningful.
 
             Please follow these guidelines:
 
-            Identify the topic, standard, or objective you will be teaching.
+            Identify the topic, grade level, or objective you will be teaching.
             Research your students' interests, hobbies, and backgrounds.
             Brainstorm several ideas that connect the subject matter to your students' lives, using their interests and backgrounds as a starting point.
             Develop activities, examples, or projects that incorporate these connections and make the content more relevant to your students.
@@ -169,16 +201,18 @@ prompts_and_fields = {
 
             Topic: {{Topic}}
 
+            Grade Level: {{Grade Level}}
+
             Student Interests: {{Student Interests}}
 
-            Please generate several ideas that make the given topic, standard, or objective relevant to your 
+            Please generate several ideas that make the given topic, grade level, or objective relevant to your 
             class based on their interests and backgrounds.
 
         """,
     },
     "Write An Email": {
         "description": "Generate a draft of email for various uses such as administrative communication, parental communication or professional use about a certain subject with a choice of tone for the email",
-        "fields": ["Subject", "Audience", "Tone", "Purpose"],
+        "fields": ["Subject", "Audience", "Tone", "Key Details"],
         "user_prompt_template": """
             You are tasked with generating a draft of an email for various uses, such as administrative 
             communication, parental communication, or professional use. The email should address a specific 
@@ -198,9 +232,9 @@ prompts_and_fields = {
 
             Tone:{{Tone}}
 
-            Purpose: {{Purpose}}
+            Key Details: {{Key Details}}
 
-            Now, compose a draft of an email based on the provided information, keeping the tone and purpose in 
+            Now, compose a draft of an email based on the provided information, keeping the tone and key details in 
             mind. Make sure to address the subject clearly and professionally while engaging the intended 
             audience.
         """,
