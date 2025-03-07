@@ -1,7 +1,11 @@
 import streamlit as st
 import os  
+from dotenv import load_dotenv
+
 from openai import AzureOpenAI  
 # Environment Variables for Azure OpenAI
+
+load_dotenv()
 endpoint = os.getenv("ENDPOINT_URL")  
 deployment = os.getenv("DEPLOYMENT_NAME")  
 subscription_key = os.getenv("AZURE_OPENAI_API_KEY")  
@@ -77,7 +81,7 @@ def generate_page(
 
 
 # Generates a response based on the provided task description and fields.
-def generate_response(task_description, user_prompt_template, fields):
+def generate_response(task_description, user_prompt_template, fields, tool):
     # System prompt to guide the model's response
     system_prompt = f"{task_description}\n\n"
 
@@ -106,12 +110,36 @@ def generate_response(task_description, user_prompt_template, fields):
         stop=None,  
         stream=False
     )
-
-    return completion.choices[0].message.content
+    response = completion.choices[0].message.content
+    if tool == "Assessment Generator":
+        response = render_math_expressions(response)
+        return st.markdown(f"### Assessment Generated: \n\n {response}")
+    else:
+        return response
 
 
 # Define the prompts and fields for different tasks
 prompts_and_fields = {
+    "Assessment Generator":{
+        "description": "Generate customized assessments for students in markdown format.",
+        "fields": ["Topic", "Grade Level", "Difficulty Level", "Number of Questions", "Additional Materials"],
+        "user_prompt_template": """
+                            You are an expert educator tasked with generating a well-structured assessment for students. The assessment should be based on the given topic, tailored to the specified grade level, and aligned with appropriate difficulty levels.
+
+                            The assessment should include the following:
+
+                            Objective: Clearly define what students should learn.
+                            Question Types: Incorporate multiple-choice, short answer, and application-based questions.
+                            Assessment Format: Structure the test logically, providing clear instructions.
+                            Engagement: Ensure that the assessment promotes critical thinking and problem-solving.
+                            Assessment Details:
+
+                            Topic: {{Topic}}
+                            Grade Level: {{Grade Level}}
+                            Difficulty Level: {{Difficulty Level}}
+                            Number of Questions: {{Number of Questions}}
+                            """
+    },
     "Lesson Planner": {
         "description": "You are an expert teacher and instructional designer skilled in using inquiry-focused teaching methods to effectively engage and challenge students through applied learning.",
         "fields": ["Topic", "Grade Level", "Duration", "Subject"],
@@ -172,7 +200,7 @@ prompts_and_fields = {
 def process_tools(fields, tool):
     task_info = prompts_and_fields[tool]
     return generate_response(
-        task_info["description"], task_info["user_prompt_template"], fields
+        task_info["description"], task_info["user_prompt_template"], fields, tool
     )
 
 
@@ -180,3 +208,55 @@ def process_tools(fields, tool):
 task_to_process_function = {
     tool: lambda fields: process_tools(fields, tool) for tool in prompts_and_fields
 }
+
+import re
+
+# Function to render LaTeX expressions with proper superscript formatting and other mathematical symbols
+def render_math_expressions(text):
+    # Replace LaTeX superscript with Unicode superscript
+    superscript_dict = {
+        "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵",
+        "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹", "+": "⁺", "-": "⁻", "=": "⁼",
+        "a": "ᵃ", "b": "ᵇ", "c": "ᶜ", "d": "ᵈ", "e": "ᵉ", "f": "ᶠ", "g": "ᵍ",
+        "h": "ʰ", "i": "ⁱ", "j": "ʲ", "k": "ᵏ", "l": "ˡ", "m": "ᵐ", "n": "ⁿ",
+        "o": "ᵒ", "p": "ᵖ", "q": "ᑫ", "r": "ʳ", "s": "ˢ", "t": "ᵗ", "u": "ᵘ",
+        "v": "ᵛ", "w": "ʷ", "x": "ˣ", "y": "ʸ", "z": "ᶻ"
+    }
+
+    # Handle superscripts in general
+    def convert_superscript(match):
+        base = match.group(1)
+        exponent = match.group(2)
+        converted_exponent = "".join([superscript_dict.get(char, char) for char in exponent])
+        return base + converted_exponent
+
+    # Handle LaTeX fractions like \frac{1}{2} --> "1/2"
+    def convert_fraction(match):
+        numerator = match.group(1)
+        denominator = match.group(2)
+        return f"{numerator}/{denominator}"
+
+    # Handle integrals: \int_{1}^{4} --> ∫ from 1 to 4
+    def convert_integral(match):
+        lower_limit = match.group(1)
+        upper_limit = match.group(2)
+        return f"∫_{lower_limit}^{upper_limit}"
+
+    # Handle logarithms: \ln --> ln
+    def convert_log(match):
+        return "ln"
+
+    # Handle other functions like \tan^{-1} --> tan⁻¹
+    def convert_inverse_function(match):
+        function_name = match.group(1)
+        return f"{function_name}⁻¹"
+
+    # Apply regex replacements for various LaTeX math symbols
+    text = re.sub(r"([a-zA-Z0-9])\^([a-zA-Z0-9]+)", convert_superscript, text)  # Superscript
+    text = re.sub(r"\\frac\{([a-zA-Z0-9]+)\}\{([a-zA-Z0-9]+)\}", convert_fraction, text)  # Fraction
+    text = re.sub(r"\\int\{([a-zA-Z0-9]+)\}\{([a-zA-Z0-9]+)\}", convert_integral, text)  # Integral
+    text = re.sub(r"\\ln", convert_log, text)  # Logarithms
+    text = re.sub(r"\\tan\^{-1}", convert_inverse_function, text)  # Inverse functions
+
+    return text
+
