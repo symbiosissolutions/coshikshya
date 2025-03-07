@@ -12,6 +12,7 @@ def app():
             "Topic",
             "Grade Level",
             "Duration",
+            "Subject",
             "Additional Materials",
         ],  # The fields needed for user input
         process_function=lambda fields: process_tools(
@@ -21,6 +22,7 @@ def app():
             "Topic": "text_input",
             "Grade Level": "text_input",
             "Duration": "text_input",
+            "Subject": "text_input",
             "Additional Materials": "file_upload",
         },
         placeholders={
