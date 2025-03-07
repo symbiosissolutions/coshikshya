@@ -1,11 +1,17 @@
 import streamlit as st
+from langchain.chat_models import AzureChatOpenAI
 import os  
 from dotenv import load_dotenv
-
+from langchain_community.retrievers import BM25Retriever
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from openai import AzureOpenAI  
+from langchain_core.runnables import RunnableMap
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
 # Environment Variables for Azure OpenAI
 
 load_dotenv()
+
 endpoint = os.getenv("ENDPOINT_URL")  
 deployment = os.getenv("DEPLOYMENT_NAME")  
 subscription_key = os.getenv("AZURE_OPENAI_API_KEY")  
@@ -17,6 +23,14 @@ client = AzureOpenAI(
     api_version="2024-05-01-preview",
 )
 
+llm = AzureChatOpenAI(
+    azure_endpoint=endpoint,  # Required
+    api_key=subscription_key,  # Optional if using env variable
+    deployment_name=deployment,  # Replace with your Azure deployment name
+    model="gpt-4o-mini",  # Or "gpt-3.5-turbo" depending on your model
+    api_version="2024-05-01-preview",
+    temperature=0.7
+)
 
 # Generates a page in the Streamlit app with a form to collect user inputs.
 def generate_page(
@@ -50,13 +64,32 @@ def generate_page(
                     key=f"{title.lower().replace(' ', '_')}_{field.lower()}",
                 )
             elif field_type == "file_upload":
+                import PyPDF2
+                from io import BytesIO
+
                 uploaded_file = st.file_uploader(
                     field,
                     type=["doc", "docx", "pdf"],
                     key=f"{title.lower().replace(' ', '_')}_{field.lower()}",
                 )
+
                 if uploaded_file:
-                    inputs[field] = uploaded_file.read().decode()
+                    if uploaded_file.type == "application/pdf":
+                        # Read PDF
+                        pdf_reader = PyPDF2.PdfReader(BytesIO(uploaded_file.read()))
+                        text = "\n".join(page.extract_text() for page in pdf_reader.pages if page.extract_text())
+                        inputs[field] = text
+
+                    elif uploaded_file.type in ["application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]:
+                        # Read DOCX using python-docx
+                        from docx import Document
+                        doc = Document(BytesIO(uploaded_file.read()))
+                        text = "\n".join([para.text for para in doc.paragraphs])
+                        inputs[field] = text
+
+                    else:
+                        st.error("Unsupported file format.")
+
             else:
                 # Dictionary -> fields : st.text_input
                 # eg "Topic": st.text_input("Topic", key="math_spiral_review_topic"
@@ -85,9 +118,19 @@ def generate_response(task_description, user_prompt_template, fields, tool):
     # System prompt to guide the model's response
     system_prompt = f"{task_description}\n\n"
 
+    if fields.get("Additional Materials"):
+        retrieved_ans = documentRAG(fields.get("Additional Materials"))
+        # st.write(retrieved_ans)
+        if tool == "Assessment Generator":
+            retrieved_ans = render_math_expressions(retrieved_ans)
+            return st.markdown(f"### Assessment Generated: \n\n {retrieved_ans}")
+        else:
+            return retrieved_ans
+        # system_prompt += retrieved_ans
     # Dynamically fill the user prompt template with the actual values from the fields
     user_prompt = user_prompt_template
     for key, value in fields.items():
+        # print(key, value)
         placeholder = f"{{{{{key}}}}}"
         if placeholder in user_prompt:
             user_prompt = user_prompt.replace(placeholder, value)
@@ -260,3 +303,26 @@ def render_math_expressions(text):
 
     return text
 
+# RAG Implementation
+
+def documentRAG(doc):
+    from langchain_core.prompts import ChatPromptTemplate
+
+    prompt = ChatPromptTemplate.from_template("""
+    Use the following pieces of context to answer the question at the end.
+    If you don't know the answer, say that you don't know.
+    Context: {context}
+    Question: {question}
+    """)
+    splitter = RecursiveCharacterTextSplitter(chunk_size = 150, chunk_overlap = 10)
+    chunks = splitter.split_text(doc)
+    bm25_retriever = BM25Retriever.from_texts(chunks, k=3)
+    # results = bm25_retriever.invoke("what would be lesson plan on listening skills?")
+    chain = RunnableMap({
+            "context": bm25_retriever, 
+            "question": RunnablePassthrough()
+        }) | prompt | llm | StrOutputParser()
+    question = "What is a lesson plan for listening skills?"
+    response = chain.invoke(question)
+    # print(response)
+    return response

@@ -1,5 +1,8 @@
-import os  
+from dotenv import load_dotenv
+import os
 from openai import AzureOpenAI  
+
+load_dotenv()
 
 # Environment Variables for Azure OpenAI
 endpoint = os.getenv("ENDPOINT_URL")  
