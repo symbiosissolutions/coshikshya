@@ -14,7 +14,7 @@ def app():
             "Additional Materials",
         ],  # The fields needed for user input
         process_function=lambda fields: process_tools(
-            fields, "Lesson Notes"
+            fields, "Lesson Notes Generator"
         ),  # Use the dynamic process function
         input_types={
             "Topic": "text_input",

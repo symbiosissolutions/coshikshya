@@ -15,7 +15,7 @@ def app():
             "Key Details",
         ],  # The fields needed for user input
         process_function=lambda fields: process_tools(
-            fields, "Write An Email"
+            fields, "Professional Email Generator"
         ),  # Use the dynamic process function
         placeholders={
             "Subject": "E.g. Parent-Teacher Conference Schedule",

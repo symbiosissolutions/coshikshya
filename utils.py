@@ -154,11 +154,9 @@ def generate_response(task_description, user_prompt_template, fields, tool):
         stream=False
     )
     response = completion.choices[0].message.content
-    if tool == "Assessment Generator":
-        response = render_math_expressions(response)
-        return st.markdown(f"### Assessment Generated: \n\n {response}")
-    else:
-        return response
+    response = render_math_expressions(response)
+    return st.markdown(f"### {tool}: \n\n {response}")
+
 
 
 # Define the prompts and fields for different tasks
@@ -234,8 +232,88 @@ prompts_and_fields = {
             Have students present projects or reflect on their learning experience.
 
             Please generate the lesson plan according to the guidelines above.
-""",
+        """,
     },
+     "Professional Email Generator": {
+        "description": "Generate well-structured and professional emails based on the given details.",
+        "fields": ["Tone", "Purpose", "Subject", "Email Body (Points)"],
+        "user_prompt_template": """
+                            You are an AI assistant specialized in drafting professional emails. Generate a structured and well-formatted email based on the provided details.
+
+                            Ensure the email includes:
+
+                            - A proper salutation.
+                            - A clear and concise body.
+                            - A professional closing.
+
+                            Email Details:
+
+                            Tone: {{Tone}}
+                            Purpose: {{Purpose}}
+                            Subject: {{Subject}}
+                            Email Body (Key Points): 
+                            - {{Email Body}}
+                            """
+    },
+
+    "Lesson Notes Generator": {
+        "description": "Generate structured lesson notes summarizing key points in bullet format.",
+        "fields": [            "Topic",
+            "Grade Level",
+            "Additional Materials"],
+        "user_prompt_template": """
+                            You are an AI assistant helping educators create concise and structured lesson notes. Extract key points from the given lesson and present them in bullet-point format.
+
+                            The lesson notes should include:
+
+                            - A summary of key concepts.
+                            - Important definitions or formulas.
+                            - Examples or applications if relevant.
+
+                            Lesson Details:
+
+                            Lesson Number/Topic: {{Topic}}
+                            Grade Level: {{Grade Level}}
+                            """
+    },
+     "Text Rewriter": {
+        "description": "Rewrite or paraphrase text while maintaining clarity and original meaning.",
+        "fields": [            "Original Text",
+            "Upload Text File",
+            "Length Preference"],
+        "user_prompt_template": """
+                            You are an AI-powered text rewriter designed to improve clarity, readability, and coherence while preserving the original meaning.
+
+                            Rewrite the given text while ensuring:
+
+                            - Clarity: Simplify complex sentences if needed.
+                            - Engagement: Make the text more readable.
+                            - Consistency: Keep the key message intact.
+
+                            Text: {{Original Text}}
+                            Preferred Style (Optional): {{Length Preferred}}
+                            """
+    },
+    
+    "Make It Relevant": {
+        "description": "Generate explanations of a topic tailored to a student's interests and grade level.",
+        "fields": ["Topic", "Grade Level", "Student Interests"],
+        "user_prompt_template": """
+                            You are an AI assistant helping educators make learning more engaging by connecting topics to students' interests. Generate an explanation of the given topic that aligns with the specified grade level and student interests.
+
+                            Ensure the explanation includes:
+
+                            - A clear and concise breakdown of the topic.
+                            - Real-world applications or examples relevant to student interests.
+                            - An engaging and relatable approach to enhance learning.
+
+                            Learning Context:
+
+                            Topic: {{Topic}}
+                            Grade Level: {{Grade Level}}
+                            Student Interests: {{Student Interests}}
+                            """
+    }
 }
 
 
